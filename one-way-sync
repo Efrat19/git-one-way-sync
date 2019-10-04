@@ -1,0 +1,32 @@
+#! /bin/sh
+set -e
+errors=0
+
+msg2slack()
+{
+    curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${build_url}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${build_url}\"  }  ] }]}" ${slack_url}
+}
+
+bfg_cleanup()
+{
+    java -jar /usr/bin/bfg-1.13.0.jar --strip-blobs-bigger-than ${bfg_size_limit} .
+    git gc --prune=now --aggressive
+}
+
+abort_merge()
+{
+      echo "There is a merge conflict. Aborting"
+      msg2slack "conflicts at *${project_name}:${pr_name}*, aborting. \n sync triggered by ${triggered_by}\n"
+      git diff --name-only --diff-filter=U
+      git merge --abort
+      errors=1
+      exit $errors
+}
+
+# merge_non_ff()
+# {
+#     git config --global user.name "${merge_commit_author}"
+#     git config --global user.email "${merge_commit_email}"
+
+# }
+
