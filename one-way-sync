@@ -66,4 +66,5 @@ main()
     ${ENABLE_BFG} && bfg_cleanup
     git push -u --tags --follow-tags --all dest 
     ${NOTIFY_ON_SUCCESS} && msg2slack "successful sync at *${PROJECT_NAME}:${PR_NAME}*. \n triggered by ${TRIGGERED_BY}\n"
+    exit $errors
 }
