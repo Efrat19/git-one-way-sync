@@ -26,6 +26,8 @@ abort_merge()
 
 set_remotes() 
 {
+    git clone ${SRC_URL}  /tmp/sync
+    cd /tmp/sync
     git remote add src ${SRC_URL}  2>/dev/null || git remote set-url src ${SRC_URL}
     git remote add dest ${DEST_URL}  2>/dev/null || git remote set-url dest ${DEST_URL}
     git fetch --multiple --prune --tags src dest
