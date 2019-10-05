@@ -23,10 +23,8 @@ abort_merge()
       exit $errors
 }
 
-set_remotes() 
+get_wd() 
 {    
-    cd /tmp
-    rm -rf sync
     git clone ${DEST_URL}  /tmp/sync
     cd /tmp/sync
     git remote add src ${SRC_URL}  2>/dev/null || git remote set-url src ${SRC_URL}
@@ -71,13 +69,11 @@ sync_branches()
 
 main()
 {
-    set_remotes
+    get_wd
     sync_branches
     ${ENABLE_BFG} && bfg_cleanup
-    git status
     git push -u --follow-tags --all 
     ${NOTIFY_ON_SUCCESS} && msg2slack "successful sync at *${PROJECT_NAME}:${PR_NAME}*. \n triggered by ${TRIGGERED_BY}\n"
-
     exit $errors
 }
 
