@@ -43,14 +43,13 @@ merge_non_ff()
 sync_branches()
 {
     git checkout -b sync/tmp_branch
-    echo "refs: $(git for-each-ref --format '%(refname)' refs/remotes/src)"
     for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/src); do
         name="${pushfrom##refs/remotes/src/}"
-        echo "name: $name"
+        # echo "name: $name"
         pushto="origin/$name"
-        echo "pushto: $pushto"
+        # echo "pushto: $pushto"
         if ( ! git show-ref $pushto > /dev/null) || git merge-base --is-ancestor $pushto $pushfrom > /dev/null; then
-            echo "newbranch: $name"
+            # echo "newbranch: $name"
             git branch -f $name $pushfrom
         else
             echo "Failed to fast-forward $pushfrom to $pushto"
