@@ -2,19 +2,19 @@
 git-one-way-sync
 
 #### general vars
-src_url=${src_url:-""}
-dest_url=${dest_url:-""} 
-merge_commit_author=${merge_commit_author:-"sync-job"}
-merge_commit_email=${merge_commit_email:-"<>"}
-enable_bfg=${enable_bfg:-"true"}
-bfg_size_limit=${bfg_size_limit:-""}100M
-allow_non_ff=${allow_non_ff:-"true"}
+SRC_URL=${SRC_URL:-""}
+DEST_URL=${DEST_URL:-""} 
+MERGE_COMMIT_AUTHOR=${MERGE_COMMIT_AUTHOR:-"sync-job"}
+MERGE_COMMIT_EMAIL=${MERGE_COMMIT_EMAIL:-"<>"}
+ENABLE_BFG=${ENABLE_BFG:-"true"}
+BFG_SIZE_LIMIT=${BFG_SIZE_LIMIT:-""}100M
+ALLOW_NON_FF_MERGE=${ALLOW_NON_FF_MERGE:-"true"}
 
 #### slack vars
-slack_url=${slack_url:-""}
-notify_on_success=${notify_on_success:-"false"}
-notify_on_failure=${notify_on_failure:-"true"}
-build_url=${build_url:-"build_url"}
-triggered_by=${triggered_by:-"triggered_by"}
-project_name=${project_name:-"project_name"}
-pr_name=${pr_name:-"pr_name"}
+SLACK_URL=${SLACK_URL:-""}
+NOTIFY_ON_SUCCESS=${NOTIFY_ON_SUCCESS:-"false"}
+NOTIFY_ON_FAILURE=${NOTIFY_ON_FAILURE:-"true"}
+BUILD_URL=${BUILD_URL:-"BUILD_URL"}
+TRIGGERED_BY=${TRIGGERED_BY:-"TRIGGERED_BY"}
+PROJECT_NAME=${PROJECT_NAME:-"PROJECT_NAME"}
+PR_NAME=${PR_NAME:-"PR_NAME"}

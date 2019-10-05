@@ -4,29 +4,66 @@ errors=0
 
 msg2slack()
 {
-    curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${build_url}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${build_url}\"  }  ] }]}" ${slack_url}
+    curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
 }
 
 bfg_cleanup()
 {
-    java -jar /usr/bin/bfg-1.13.0.jar --strip-blobs-bigger-than ${bfg_size_limit} .
+    git checkout dest/master
+    java -jar /usr/bin/bfg-1.13.0.jar --strip-blobs-bigger-than ${BFG_SIZE_LIMIT} .
     git gc --prune=now --aggressive
 }
 
 abort_merge()
 {
-      echo "There is a merge conflict. Aborting"
-      msg2slack "conflicts at *${project_name}:${pr_name}*, aborting. \n sync triggered by ${triggered_by}\n"
+      echo "There is a merge conflict on branch $1. Aborting"
+      ${NOTIFY_ON_FAILURE} && msg2slack "conflicts at *${PROJECT_NAME}:${PR_NAME}*, aborting. \n sync triggered by ${TRIGGERED_BY}\n"
       git diff --name-only --diff-filter=U
       git merge --abort
       errors=1
       exit $errors
 }
 
-# merge_non_ff()
-# {
-#     git config --global user.name "${merge_commit_author}"
-#     git config --global user.email "${merge_commit_email}"
+set_remotes() 
+{
+    git remote add src ${SRC_URL}  2>/dev/null || git remote set-url src ${SRC_URL}
+    git remote add dest ${DEST_URL}  2>/dev/null || git remote set-url dest ${DEST_URL}
+    git fetch --multiple --prune --tags src dest
+}
 
-# }
+merge_non_ff()
+{
+    git config user.name "${MERGE_COMMIT_AUTHOR}"
+    git config user.email "${MERGE_COMMIT_EMAIL}"
+    git checkout dest/$1
+    git merge --no-edit src/$1 || abort_merge $1
+}
 
+sync_branches()
+{
+    for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/src); do
+        name="${pushfrom##refs/remotes/src/}"
+        pushto="refs/remotes/dest/$name"
+        if ( ! git show-ref $pushto > /dev/null) || git merge-base --is-ancestor $pushto $pushfrom > /dev/null; then
+            git branch -f $name $pushfrom
+        else
+            echo "Failed to fast-forward $pushfrom to $pushto"
+            if ${ALLOW_NON_FF_MERGE} 
+                merge_non_ff $name
+            else
+               ${NOTIFY_ON_FAILURE} && msg2slack "Failed to fast-forward $pushfrom to $pushto\n at *${PROJECT_NAME}:${PR_NAME}*, aborting sync. \n sync triggered by ${TRIGGERED_BY}\n" 
+               errors=1
+               exit $errors
+            fi
+        fi
+    done
+}
+
+main()
+{
+    set_remotes
+    sync_branches
+    ${ENABLE_BFG} && bfg_cleanup
+    git push -u --tags --follow-tags --all dest 
+    ${NOTIFY_ON_SUCCESS} && msg2slack "successful sync at *${PROJECT_NAME}:${PR_NAME}*. \n triggered by ${TRIGGERED_BY}\n"
+}
