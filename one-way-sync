@@ -70,3 +70,5 @@ main()
     ${NOTIFY_ON_SUCCESS} && msg2slack "successful sync at *${PROJECT_NAME}:${PR_NAME}*. \n triggered by ${TRIGGERED_BY}\n"
     exit $errors
 }
+
+main 
