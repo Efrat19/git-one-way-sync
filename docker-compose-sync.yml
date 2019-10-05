@@ -3,4 +3,3 @@ services:
   sync:
     build: .
     env_file: .env
-    entrypoint: sleep 10
