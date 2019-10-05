@@ -48,7 +48,7 @@ sync_branches()
             git branch -f $name $pushfrom
         else
             echo "Failed to fast-forward $pushfrom to $pushto"
-            if ${ALLOW_NON_FF_MERGE} 
+            if ${ALLOW_NON_FF_MERGE}; then 
                 merge_non_ff $name
             else
                ${NOTIFY_ON_FAILURE} && msg2slack "Failed to fast-forward $pushfrom to $pushto\n at *${PROJECT_NAME}:${PR_NAME}*, aborting sync. \n sync triggered by ${TRIGGERED_BY}\n" 
