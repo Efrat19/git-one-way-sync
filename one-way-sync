@@ -37,7 +37,7 @@ merge_non_ff()
 {
     git config user.name "${MERGE_COMMIT_AUTHOR}"
     git config user.email "${MERGE_COMMIT_EMAIL}"
-    git checkout $1
+    git checkout $1 || git checkout --track origin/$1
     git merge --no-edit src/$1 || abort_merge $1
 }
 
