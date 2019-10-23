@@ -97,7 +97,7 @@ main()
     merge_current
     ${ENABLE_BFG} && bfg_cleanup
     echo "******* pulling ******"
-    git pull --no-edit || abort_merge
+    git pull --no-edit --allow-unrelated-histories || abort_merge
     git status
     echo "******* pushing ******"
     git push -u --tags --follow-tags to ${CI_COMMIT_REF_NAME}
