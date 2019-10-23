@@ -31,5 +31,3 @@ RUN mkdir -p ~/.ssh && \
     ssh-keyscan -H gitlab.doc.ic.ac.uk >> ~/.ssh/known_hosts
 
 COPY git-one-way-sync /usr/local/bin/
-
-ENTRYPOINT git one-way-sync
