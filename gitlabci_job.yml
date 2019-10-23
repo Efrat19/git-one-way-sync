@@ -17,4 +17,4 @@ sync_github:
     script:
     - ls
     - git status
-     - git one-way-sync 
+    - git one-way-sync 
