@@ -9,6 +9,7 @@ msg2slack()
 
 bfg_cleanup()
 {
+echo "******* bfg cleanup ******"
     java -jar /usr/bin/bfg-1.13.0.jar --strip-blobs-bigger-than ${BFG_SIZE_LIMIT} . > /dev/null
     git reflog expire --expire=now --all
     git gc --prune=now --aggressive
@@ -16,6 +17,7 @@ bfg_cleanup()
 
 abort_merge()
 {
+echo "******* abort merge ******"
       echo "There is a merge conflict on branch $1. Aborting"
       ${NOTIFY_ON_FAILURE} && msg2slack "CONFLICTS at *${PROJECT_NAME}:${PR_NAME}*, aborting. \n sync triggered by ${TRIGGERED_BY}\n"
       git diff --name-only --diff-filter=U
@@ -25,6 +27,7 @@ abort_merge()
 }
 
 delete_locals() {
+echo "******* delete locals ******"
     git checkout --detach
     for branch in $(git for-each-ref --format '%(refname:short)' refs/heads); do
     git branch -D $branch
@@ -33,6 +36,7 @@ delete_locals() {
 
 get_remotes() 
 {    
+echo "******* get remotes ******"
     # Add and fetch remotes
     git remote add from ${SRC_URL}  2>/dev/null || git remote set-url from ${SRC_URL}
     git remote add to   ${DEST_URL}  2>/dev/null || git remote set-url to   ${DEST_URL}
@@ -41,6 +45,7 @@ get_remotes()
 
 merge_current()
 {
+echo "******* merge current ******"
     git config user.name "${MERGE_COMMIT_AUTHOR}"
     git config user.email "${MERGE_COMMIT_EMAIL}"
     git remote add origin   ${DEST_URL}  2>/dev/null || git remote set-url origin   ${DEST_URL}
@@ -50,6 +55,7 @@ merge_current()
 
 sync_branches()
 {
+echo "******* sync branches ******"
     for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/from); do
     name="${pushfrom##refs/remotes/from/}"
     pushto="refs/remotes/to/$name"
@@ -69,6 +75,7 @@ sync_branches()
 
 copy_new_branches()
 {
+echo "******* copy new branches ******"
     for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/from); do
     name="${pushfrom##refs/remotes/from/}"
     pushto="refs/remotes/to/$name"
