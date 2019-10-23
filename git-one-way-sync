@@ -25,9 +25,6 @@ abort_merge()
 }
 
 delete_locals() {
-    # Delete existing branches
-    ls
-    git status
     git checkout --detach
     for branch in $(git for-each-ref --format '%(refname:short)' refs/heads); do
     git branch -D $branch
