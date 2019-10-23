@@ -17,61 +17,66 @@ bfg_cleanup()
 abort_merge()
 {
       echo "There is a merge conflict on branch $1. Aborting"
-      ${NOTIFY_ON_FAILURE} && msg2slack "conflicts at *${PROJECT_NAME}:${PR_NAME}*, aborting. \n sync triggered by ${TRIGGERED_BY}\n"
+      ${NOTIFY_ON_FAILURE} && msg2slack "CONFLICTS at *${PROJECT_NAME}:${PR_NAME}*, aborting. \n sync triggered by ${TRIGGERED_BY}\n"
       git diff --name-only --diff-filter=U
       git merge --abort
       errors=1
       exit $errors
 }
 
-get_wd() 
-{    
-    git clone ${DEST_URL}  /tmp/sync
-    cd /tmp/sync
-    git remote add src ${SRC_URL}  2>/dev/null || git remote set-url src ${SRC_URL}
-    git remote add dest ${DEST_URL}  2>/dev/null || git remote set-url dest ${DEST_URL}
-    git fetch --multiple --prune --tags src
+delete_locals() {
+    # Delete existing branches
+    git checkout --detach
+    for branch in $(git for-each-ref --format '%(refname:short)' refs/heads); do
+    git branch -D $branch
+    done
 }
 
-merge_non_ff()
+get_remotes() 
+{    
+    # Add and fetch remotes
+    git remote add from $SRC_URL  2>/dev/null || git remote set-url from $SRC_URL
+    git remote add to   ${DEST_URL}  2>/dev/null || git remote set-url to   ${DEST_URL}
+    git fetch --multiple --prune from to
+}
+
+merge_current()
 {
     git config user.name "${MERGE_COMMIT_AUTHOR}"
     git config user.email "${MERGE_COMMIT_EMAIL}"
-    git checkout $1 || git checkout --track src/$1
-    git merge --no-edit src/$1 || abort_merge $1
+    git remote add origin   ${DEST_URL}  2>/dev/null || git remote set-url origin   ${DEST_URL}
+    git checkout --track origin/${CI_COMMIT_REF_NAME}
+    git merge from/${CI_COMMIT_REF_NAME} --no-edit || abort_merge ${CI_COMMIT_REF_NAME}
 }
 
 sync_branches()
 {
-    git checkout -b sync/tmp_branch
-    for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/src); do
-        name="${pushfrom##refs/remotes/src/}"
-        # echo "name: $name"
-        pushto="origin/$name"
-        # echo "pushto: $pushto"
-        if ( ! git show-ref $pushto > /dev/null) || git merge-base --is-ancestor $pushto $pushfrom > /dev/null; then
-            # echo "newbranch: $name"
-            git branch -f $name $pushfrom
-        else
-            echo "Failed to fast-forward $pushfrom to $pushto"
-            if ${ALLOW_NON_FF_MERGE}; then 
-                merge_non_ff $name
-            else
-               ${NOTIFY_ON_FAILURE} && msg2slack "Failed to fast-forward $pushfrom to $pushto\n at *${PROJECT_NAME}:${PR_NAME}*, aborting sync. \n sync triggered by ${TRIGGERED_BY}\n" 
-               errors=1
-               exit $errors
-            fi
+    for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/from); do
+    name="${pushfrom##refs/remotes/from/}"
+    pushto="refs/remotes/to/$name"
+    if ( ! git show-ref $pushto > /dev/null) || git merge-base --is-ancestor $pushto $pushfrom > /dev/null; then
+        git branch -f $name $pushfrom
+    else
+        if  [ "$name" != "${CI_COMMIT_REF_NAME}" ]; then
+            echo "Failed to fast-forward $pushfrom to $pushto, relevant commits:"
+            git show-ref $name
+            ${NOTIFY_ON_FAILURE} && msg2slack "Failed to fast-forward $pushfrom to $pushto at *${PROJECT_NAME}:${PR_NAME}*, aborting. \n sync triggered by ${TRIGGERED_BY}\n"
+            errors=1
         fi
+    fi
     done
-    git checkout master
-    git branch -d sync/tmp_branch
 }
 
 main()
 {
-    get_wd
+    delete_locals
+    get_remotes
     sync_branches
+    merge_current
     ${ENABLE_BFG} && bfg_cleanup
+    git pull
+    git status
+    git push -u --tags --follow-tags to ${CI_COMMIT_REF_NAME}
     git push -u --follow-tags --all 
     ${NOTIFY_ON_SUCCESS} && msg2slack "successful sync at *${PROJECT_NAME}:${PR_NAME}*. \n triggered by ${TRIGGERED_BY}\n"
     exit $errors

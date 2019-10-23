@@ -1,0 +1,18 @@
+sync_github:
+    stage: sync 
+    variables:
+        SRC_URL: ${CI_REPOSITORY_URL}
+        DEST_URL: https://y2devops:${Y2DEVOPS_TOKEN}@github.com/axel-springer-kugawana/${GITHUB_PROJECT_NAME}.git
+        ENABLE_BFG: "true"
+        BFG_SIZE_LIMIT: "100M"
+        SLACK_URL: ${SLACK_URL}
+        NOTIFY_ON_SUCCESS: "true"
+        NOTIFY_ON_FAILURE: "true"
+        BUILD_URL: ${CI_PIPELINE_URL}
+        TRIGGERED_BY: "${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})"
+        PROJECT_NAME: ${CI_PROJECT_PATH_SLUG}
+        PR_NAME: ${CI_COMMIT_REF_NAME}
+    image: efrat19/git-one-way-sync
+    before_script: []
+    script:
+     - one-way-sync 
