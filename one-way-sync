@@ -35,7 +35,7 @@ delete_locals() {
 get_remotes() 
 {    
     # Add and fetch remotes
-    git remote add from $SRC_URL  2>/dev/null || git remote set-url from $SRC_URL
+    git remote add from ${SRC_URL}  2>/dev/null || git remote set-url from ${SRC_URL}
     git remote add to   ${DEST_URL}  2>/dev/null || git remote set-url to   ${DEST_URL}
     git fetch --multiple --prune from to
 }
@@ -70,6 +70,7 @@ sync_branches()
 main()
 {
     delete_locals
+    echo ${SRC_URL}
     get_remotes
     sync_branches
     merge_current
