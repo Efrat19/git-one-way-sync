@@ -67,15 +67,26 @@ sync_branches()
     done
 }
 
+copy_new_branches()
+{
+    for pushfrom in $(git for-each-ref --format '%(refname)' refs/remotes/from); do
+    name="${pushfrom##refs/remotes/from/}"
+    pushto="refs/remotes/to/$name"
+    if ( ! git show-ref $pushto > /dev/null) || git merge-base --is-ancestor $pushto $pushfrom > /dev/null; then
+        git branch -f $name $pushfrom
+    else
+        if  [ "$name" != "${CI_COMMIT_REF_NAME}" ]; then
+            echo "branch $name already exists in destination, skipping merge. push to that branch to trigger update."
+        fi
+    fi
+    done
+}
+
 main()
 {
-    echo "delete_locals"
     delete_locals
-    echo "get_remotes"
     get_remotes
-    echo "sync_branches"
-    sync_branches
-    echo "merge_current"
+    copy_new_branches
     merge_current
     ${ENABLE_BFG} && bfg_cleanup
     git pull
