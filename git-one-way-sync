@@ -4,7 +4,7 @@ errors=0
 
 msg2slack()
 {
-    curl --quite -X POST -k -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
+    curl --silent -X POST -k -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
 }
 
 bfg_cleanup()
