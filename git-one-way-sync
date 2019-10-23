@@ -4,7 +4,7 @@ errors=0
 
 msg2slack()
 {
-    curl -X POST -k -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
+    curl --quite -X POST -k -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
 }
 
 bfg_cleanup()
@@ -64,6 +64,7 @@ sync_branches()
             git show-ref $name
             ${NOTIFY_ON_FAILURE} && msg2slack "Failed to fast-forward $pushfrom to $pushto at *${PROJECT_NAME}:${PR_NAME}*, aborting. \n sync triggered by ${TRIGGERED_BY}\n"
             errors=1
+            exit $errors
         fi
     fi
     done
