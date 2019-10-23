@@ -16,4 +16,5 @@ sync_github:
         PR_NAME: ${CI_COMMIT_REF_NAME}
     image: efrat19/git-one-way-sync
     before_script: []
-    script: []
+    script: 
+    - git one-way-sync
