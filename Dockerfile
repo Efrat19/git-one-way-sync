@@ -32,4 +32,4 @@ RUN mkdir -p ~/.ssh && \
 
 COPY git-one-way-sync /usr/local/bin/
 
-ENTRYPOINT one-way-sync
+ENTRYPOINT git one-way-sync
