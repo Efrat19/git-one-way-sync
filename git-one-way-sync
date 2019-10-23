@@ -76,7 +76,7 @@ copy_new_branches()
         git branch -f $name $pushfrom
     else
         if  [ "$name" != "${CI_COMMIT_REF_NAME}" ]; then
-            echo "branch $name already exists in destination, skipping merge. push to that branch to trigger update."
+            echo "branch $name already exists in destination, skipping update. push to that branch to trigger merge."
         fi
     fi
     done
