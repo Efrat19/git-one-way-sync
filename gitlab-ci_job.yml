@@ -15,4 +15,4 @@ sync_github:
     image: efrat19/git-one-way-sync
     before_script: []
     script:
-     - one-way-sync 
+     - git one-way-sync 
