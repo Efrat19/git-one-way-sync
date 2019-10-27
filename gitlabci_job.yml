@@ -15,6 +15,7 @@ sync_github:
         PROJECT_NAME: ${CI_PROJECT_PATH_SLUG}
         PR_NAME: ${CI_COMMIT_REF_NAME}
     image: efrat19/git-one-way-sync
+    allow_failure: true
     before_script: []
     script: 
     - git one-way-sync
