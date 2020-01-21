@@ -22,7 +22,7 @@ RUN apk add --no-cache git openssh-client curl openjdk8-jre
 
 # install bfg
 RUN cd /usr/bin && \
-    wget http://repo1.maven.org/maven2/com/madgag/bfg/1.13.0/bfg-1.13.0.jar
+    wget https://repo1.maven.org/maven2/com/madgag/bfg/1.13.0/bfg-1.13.0.jar
 
 #add ssh
 RUN mkdir -p ~/.ssh && \
