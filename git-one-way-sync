@@ -49,6 +49,9 @@ echo "******* merge current ******"
     git config user.name "${MERGE_COMMIT_AUTHOR}"
     git config user.email "${MERGE_COMMIT_EMAIL}"
     git remote add origin   ${DEST_URL}  2>/dev/null || git remote set-url origin   ${DEST_URL}
+    if  [ "master" -eq "${CI_COMMIT_REF_NAME}" ]; then
+        git branch -d ${CI_COMMIT_REF_NAME}
+    fi
     git checkout --track origin/${CI_COMMIT_REF_NAME} || abort_merge ${CI_COMMIT_REF_NAME}
     git merge from/${CI_COMMIT_REF_NAME} --no-edit || abort_merge ${CI_COMMIT_REF_NAME}
 }
