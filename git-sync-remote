@@ -1,4 +1,5 @@
 #!/bin/sh
+#https://github.com/IgnoredAmbience/github-gitlab-sync/blob/master/git-sync-remote
 
 # Terminate on first failure
 set -e
