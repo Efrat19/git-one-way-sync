@@ -7,6 +7,14 @@ msg2slack()
     curl --silent -X POST -k -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
 }
 
+is_skip()
+{
+if [[ ${PROJECT_NAME} -eq "develeap-yad2site" || ${PROJECT_NAME} -eq "platform-shared" ]]; then
+    msg2slack "SKIPPING at *${PROJECT_NAME}:${PR_NAME}*. \n sync triggered by ${TRIGGERED_BY}\n"
+    exit 0
+fi
+}
+
 bfg_cleanup()
 {
 echo "******* bfg cleanup ******"
@@ -94,6 +102,7 @@ echo "******* copy new branches ******"
 
 main()
 {
+    is_skip
     delete_locals
     get_remotes
     copy_new_branches
