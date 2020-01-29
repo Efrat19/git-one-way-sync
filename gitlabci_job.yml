@@ -17,5 +17,4 @@ sync_github:
     image: efrat19/git-one-way-sync
     allow_failure: true
     before_script: []
-    script: 
-    - git one-way-sync
+    script: []
