@@ -31,4 +31,5 @@ RUN mkdir -p ~/.ssh && \
     ssh-keyscan -H gitlab.doc.ic.ac.uk >> ~/.ssh/known_hosts
 
 COPY git-one-way-sync /usr/local/bin/
-COPY git-sync-remote /usr/local/bin/ && chmod +x /usr/local/bin/git-sync-remote
+COPY git-sync-remote /usr/local/bin/ 
+RUN chmod +x /usr/local/bin/git-sync-remote
