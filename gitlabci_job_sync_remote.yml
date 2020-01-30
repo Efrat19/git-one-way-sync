@@ -18,4 +18,4 @@ sync_github:
     allow_failure: true
     before_script: []
     script: 
-    - git sync-remote
+    - git mirror-repo
