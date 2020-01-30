@@ -33,3 +33,5 @@ RUN mkdir -p ~/.ssh && \
 COPY git-one-way-sync /usr/local/bin/
 COPY git-sync-remote /usr/local/bin/ 
 RUN chmod +x /usr/local/bin/git-sync-remote
+COPY git-mirror-repo /usr/local/bin/ 
+RUN chmod +x /usr/local/bin/git-mirror-repo
