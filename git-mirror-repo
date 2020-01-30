@@ -1,0 +1,19 @@
+
+msg2slack()
+{
+    curl --silent -X POST -k -H 'Content-type: application/json' --data "{\"text\":\"$1\",\"attachments\": [   {  \"fallback\": \"go to build ${BUILD_URL}\",  \"actions\": [ {  \"type\": \"button\", \"text\": \"go to build\", \"url\": \"${BUILD_URL}\"  }  ] }]}" ${SLACK_URL}
+}
+
+bfg_cleanup()
+{
+echo "******* bfg cleanup ******"
+    java -jar /usr/bin/bfg-1.13.0.jar --strip-blobs-bigger-than ${BFG_SIZE_LIMIT} . > /dev/null
+    git reflog expire --expire=now --all
+    git gc --prune=now --aggressive
+}
+
+git fetch --prune
+bfg_cleanup
+git push --prune ${DEST_URL} +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
+
+msg2slack "mirrored ${PROJECT_NAME}:${PR_NAME}"
