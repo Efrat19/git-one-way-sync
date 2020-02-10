@@ -16,4 +16,4 @@ git fetch --prune
 bfg_cleanup
 git push -f --prune ${DEST_URL} +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
 
-msg2slack "mirrored ${PROJECT_NAME}:${PR_NAME}"
+msg2slack "mirrored ${PROJECT_NAME}:${PR_NAME}, triggered by ${TRIGGERED_BY}"
