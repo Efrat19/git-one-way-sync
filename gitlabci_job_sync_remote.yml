@@ -2,7 +2,7 @@ sync_github:
     stage: sync 
     variables:
         SRC_URL: ${CI_REPOSITORY_URL}
-        DEST_URL: https://y2devops:${Y2DEVOPS_TOKEN}@github.com/axel-springer-kugawana/${GITHUB_PROJECT_NAME}.git
+        DEST_URL: https://y2devops:${Y2DEVOPS_TOKEN}@github.com/axel-springer-kugawana/${GITHUB_PROJECT_NAME}_fail.git
         ENABLE_BFG: "false"
         MERGE_COMMIT_AUTHOR: gitlab-sync
         MERGE_COMMIT_EMAIL: devops@yad2.co.il
